@@ -1,13 +1,13 @@
 import torch
-from torch import einsum
+from torch import nn, einsum
 
 from einops import rearrange
 
 
 def expand_dim(t, dim, k):
-'''
-    Expand dims for t at dim to k
-'''
+    """
+        Expand dims for t at dim to k
+    """
     t = t.unsqueeze(dim = dim)
     expand_shape = [-1] * len(t.shape)
     expand_shape[dim] = k
@@ -15,37 +15,37 @@ def expand_dim(t, dim, k):
 
 
 def rel_to_abs(x):
-'''
-    x: [B, Nh * H, L, 2L - 1]
-    Convert relative position between the key and query to their absolute position respectively.
-    Tensowflow source code in the appendix of: https://arxiv.org/pdf/1904.09925.pdf
-'''
+    """
+        x: [B, Nh * H, L, 2L - 1]
+        Convert relative position between the key and query to their absolute position respectively.
+        Tensowflow source code in the appendix of: https://arxiv.org/pdf/1904.09925.pdf
+    """
     B, Nh, L, _ = x.shape
     # pad to shift from relative to absolute indexing
     col_pad = torch.zeros((B, Nh, L, 1))
     x = torch.cat((x, col_pad), dim=3)
     flat_x = torch.reshape(x, (B, Nh, L * 2 * L))
-    flat_pad = torch.zeros((B, Nh, L + 1))
+    flat_pad = torch.zeros((B, Nh, L - 1))
     flat_x = torch.cat((flat_x, flat_pad), dim=2)
     # Reshape and slice out the padded elements
-    final_x = torch.reshape(flat_x, (B, Nh, L + 1, 2 * L + 1))
+    final_x = torch.reshape(flat_x, (B, Nh, L + 1, 2 * L - 1))
     return final_x[:, :, :L, L - 1:]
 
 
 def relative_logits_1d(q, rel_k):
-'''
-    q: [B, Nh, H, W, d]
-    rel_k: [2W - 1, d]
-    Computes relative logits along one dimension.
-    The details of relative position is explained in: https://arxiv.org/pdf/1803.02155.pdf
-'''
+    """
+        q: [B, Nh, H, W, d]
+        rel_k: [2W - 1, d]
+        Computes relative logits along one dimension.
+        The details of relative position is explained in: https://arxiv.org/pdf/1803.02155.pdf
+    """
     B, Nh, H, W, _ = q.shape
     rel_logits = torch.einsum('b n h w d, m d -> b n h w m', q, rel_k)
     # Collapse height and heads
     rel_logits = torch.reshape(rel_logits, (-1, Nh * H, W, 2 * W - 1))
     rel_logits = rel_to_abs(rel_logits)
     rel_logits = torch.reshape(rel_logits, (-1, Nh, H, W, W))
-    rel_logits = torch.expand_dim(rel_logits, dim=3, k=H)
+    rel_logits = expand_dim(rel_logits, dim=3, k=H)
     return rel_logits
 
 
@@ -74,7 +74,7 @@ class RelPosEmb(nn.Module):
         self.rel_width = nn.Parameter(torch.randn(width * 2 - 1, dim_head) * scale)
 
     def forward(self, q):
-        h, w = self.fmap_size
+        h = w = self.fmap_size
 
         q = rearrange(q, 'b h (x y) d -> b h x y d', x = h, y = w)
         rel_logits_w = relative_logits_1d(q, self.rel_width)

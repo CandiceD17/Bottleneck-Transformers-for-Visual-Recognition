@@ -2,7 +2,7 @@ import torch
 from torch import nn, einsum
 from einops import rearrange
 
-from self_attention_block import MHSA
+from .self_attention_block import MHSA
 
 
 """Bottleneck Transformer (BoT) Block."""
@@ -19,12 +19,12 @@ class BoTBlock(nn.Module):
         dim_v = 128,
         rel_pos_emb = False,
         activation = nn.ReLU()):
-    '''
+        """
         dim: channels in feature map
         dim_out: output channels for feature map
-    '''
+        """
         super().__init__()
-        if dim != dim_out or strides != 1:
+        if dim != dim_out or stride != 1:
             self.shortcut = nn.Sequential(
                 nn.Conv2d(dim, dim_out, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(dim_out),
@@ -82,10 +82,10 @@ class BoTStack(nn.Module):
         rel_pos_emb = False,
         activation = nn.ReLU()
     ):
-    '''
+        """
         dim: channels in feature map
         fmap_size: [H, W]
-    '''
+        """
         super().__init__()
 
         self.dim = dim
@@ -100,11 +100,11 @@ class BoTStack(nn.Module):
             fmap_divisor = (2 if stride == 2 and not is_first else 1)
             layer_fmap_size = tuple(map(lambda t: t // fmap_divisor, fmap_size))
 
-            layers.append(BottleBlock(
+            layers.append(BoTBlock(
                 dim = dim,
                 fmap_size = layer_fmap_size,
                 dim_out = dim_out,
-                stride = strides if is_first else 1,
+                stride = stride if is_first else 1,
                 heads = heads,
                 proj_factor = proj_factor,
                 dim_qk = dim_qk,
