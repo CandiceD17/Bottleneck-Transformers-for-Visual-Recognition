@@ -37,15 +37,16 @@ def relative_logits_1d(q, rel_k):
     q: [B, Nh, H, W, d]
     rel_k: [2W - 1, d]
     Computes relative logits along one dimension.
+    The details of relative position is explained in: https://arxiv.org/pdf/1803.02155.pdf
 '''
-B, Nh, H, W, _ = q.shape
-rel_logits = torch.einsum('b n h w d, m d -> b n h w m', q, rel_k)
-# Collapse height and heads
-rel_logits = torch.reshape(rel_logits, (-1, Nh * H, W, 2 * W - 1))
-rel_logits = rel_to_abs(rel_logits)
-rel_logits = torch.reshape(rel_logits, (-1, Nh, H, W, W))
-rel_logits = torch.expand_dim(rel_logits, dim=3, k=H)
-return rel_logits
+    B, Nh, H, W, _ = q.shape
+    rel_logits = torch.einsum('b n h w d, m d -> b n h w m', q, rel_k)
+    # Collapse height and heads
+    rel_logits = torch.reshape(rel_logits, (-1, Nh * H, W, 2 * W - 1))
+    rel_logits = rel_to_abs(rel_logits)
+    rel_logits = torch.reshape(rel_logits, (-1, Nh, H, W, W))
+    rel_logits = torch.expand_dim(rel_logits, dim=3, k=H)
+    return rel_logits
 
 
 class AbsPosEmb(nn.Module):
