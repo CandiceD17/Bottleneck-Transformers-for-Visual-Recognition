@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 
 from model.resnet_backbone import ResNet_with_BotStack
 
-BATCH_SIZE = 256
+BATCH_SIZE = 64
 EPOCHS = 5
 IMAGE_DIR = "./ImageNet/"
 
