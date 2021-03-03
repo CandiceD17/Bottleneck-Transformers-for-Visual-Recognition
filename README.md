@@ -7,7 +7,7 @@ Link to paper: https://arxiv.org/abs/2101.11605
 
 Structure of Self-Attention layer in paper:
 
-![self-attention layer](https://github.com/CandiceD17/BoTNet-for-Visual-Recognition/blob/master/assets/self-attention-layer.png)
+![self-attention layer](https://github.com/CandiceD17/BoTNet-for-Visual-Recognition/blob/master/asset/self-attention-layer.png)
 
 ### Train the Network
 
