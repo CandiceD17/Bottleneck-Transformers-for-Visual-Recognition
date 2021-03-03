@@ -6,6 +6,8 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+from model.resnet_backbone import ResNet_with_BotStack
+
 BATCH_SIZE = 256
 EPOCHS = 5
 IMAGE_DIR = "./ImageNet/"
@@ -56,7 +58,7 @@ if __name__ == "__main__":
     traindir = os.path.join(IMAGE_DIR, "train")
     trainset = torchvision.datasets.ImageFolder(
         root=traindir,
-        transform=trasforms.Compose(
+        transform=transforms.Compose(
             [
                 transforms.RandomResizedCrop(224),
                 transforms.RandomHorizontalFlip(),
@@ -78,11 +80,11 @@ if __name__ == "__main__":
     """
     define network
     """
-    net = ResNet_with_BotStack(fmap_size=(224, 224), botnet=True)
+    net = ResNet_with_BotStack(fmap_size=(14, 14), botnet=True)
     net.to(device)
     optimizer = torch.optim.SGD(
         net.parameters(),
-        lr=1e-4,
+        lr=0.1,
         momentum=0.9,
         weight_decay=1e-4,
         nesterov=True,
