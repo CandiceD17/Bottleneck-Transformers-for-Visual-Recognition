@@ -36,7 +36,7 @@ For exmaple, to update `cfg.TRAIN.BATCH_SIZE`, you can either type `--train-batc
 
 ```yaml
 TRAIN:
-	BATCH_SIZE: 256
+  BATCH_SIZE: 256
 ```
 
 ## References
