@@ -28,7 +28,7 @@ To train BoTNet from scratch using the standard training process:
 $ python3 train.py
 ```
 
-To execute this code, you should have ImageNet downloaded in your local directory and correct path set in `_C.TRAIN.DATASET` and`_C.TRAIN.DATASET` in `util/config.py`.
+To execute this code, you should have ImageNet downloaded in your local directory and correct path set in `_C.TRAIN.DATASET` and`_C.TEST.DATASET` in `util/config.py`.
 
 You can use `.yaml` or pass in any parameters in command line to overwrite the configures in `config.py`.
 
