@@ -30,11 +30,10 @@ class BoTBlock(nn.Module):
                 nn.BatchNorm2d(dim_out),
                 activation
             )
-            dim = dim_out
         else:
             self.shortcut = nn.Identity()
         
-        bottleneck_dimension = dim_out // proj_factor
+        bottleneck_dimension = dim_out // proj_factor # from 2048 to 512
         attn_dim_out = heads * dim_v
 
         self.net = nn.Sequential(

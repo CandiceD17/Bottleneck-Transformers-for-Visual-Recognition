@@ -3,10 +3,12 @@ from torch import nn, einsum
 
 from einops import rearrange
 
+device = "cuda"
+
 
 def expand_dim(t, dim, k):
     """
-        Expand dims for t at dim to k
+    Expand dims for t at dim to k
     """
     t = t.unsqueeze(dim = dim)
     expand_shape = [-1] * len(t.shape)
@@ -16,16 +18,16 @@ def expand_dim(t, dim, k):
 
 def rel_to_abs(x):
     """
-        x: [B, Nh * H, L, 2L - 1]
-        Convert relative position between the key and query to their absolute position respectively.
-        Tensowflow source code in the appendix of: https://arxiv.org/pdf/1904.09925.pdf
+    x: [B, Nh * H, L, 2L - 1]
+    Convert relative position between the key and query to their absolute position respectively.
+    Tensowflow source code in the appendix of: https://arxiv.org/pdf/1904.09925.pdf
     """
     B, Nh, L, _ = x.shape
     # pad to shift from relative to absolute indexing
-    col_pad = torch.zeros((B, Nh, L, 1))
+    col_pad = torch.zeros((B, Nh, L, 1)).to(device)
     x = torch.cat((x, col_pad), dim=3)
     flat_x = torch.reshape(x, (B, Nh, L * 2 * L))
-    flat_pad = torch.zeros((B, Nh, L - 1))
+    flat_pad = torch.zeros((B, Nh, L - 1)).to(device)
     flat_x = torch.cat((flat_x, flat_pad), dim=2)
     # Reshape and slice out the padded elements
     final_x = torch.reshape(flat_x, (B, Nh, L + 1, 2 * L - 1))
@@ -34,10 +36,10 @@ def rel_to_abs(x):
 
 def relative_logits_1d(q, rel_k):
     """
-        q: [B, Nh, H, W, d]
-        rel_k: [2W - 1, d]
-        Computes relative logits along one dimension.
-        The details of relative position is explained in: https://arxiv.org/pdf/1803.02155.pdf
+    q: [B, Nh, H, W, d]
+    rel_k: [2W - 1, d]
+    Computes relative logits along one dimension.
+    The details of relative position is explained in: https://arxiv.org/pdf/1803.02155.pdf
     """
     B, Nh, H, W, _ = q.shape
     rel_logits = torch.einsum('b n h w d, m d -> b n h w m', q, rel_k)
