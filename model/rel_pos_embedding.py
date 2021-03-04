@@ -3,8 +3,6 @@ from torch import nn, einsum
 
 from einops import rearrange
 
-device = "cuda"
-
 
 def expand_dim(t, dim, k):
     """
@@ -24,10 +22,10 @@ def rel_to_abs(x):
     """
     B, Nh, L, _ = x.shape
     # pad to shift from relative to absolute indexing
-    col_pad = torch.zeros((B, Nh, L, 1)).to(device)
+    col_pad = torch.zeros((B, Nh, L, 1)).cuda()
     x = torch.cat((x, col_pad), dim=3)
     flat_x = torch.reshape(x, (B, Nh, L * 2 * L))
-    flat_pad = torch.zeros((B, Nh, L - 1)).to(device)
+    flat_pad = torch.zeros((B, Nh, L - 1)).cuda()
     flat_x = torch.cat((flat_x, flat_pad), dim=2)
     # Reshape and slice out the padded elements
     final_x = torch.reshape(flat_x, (B, Nh, L + 1, 2 * L - 1))
