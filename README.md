@@ -1,5 +1,5 @@
-# BoTNet-for-Visual-Recognition
-### Introduction
+# Bottleneck-Transformers-for-Visual-Recognition
+## Introduction
 
 PyTorch Implementation of **Bottleneck Transformers for Visual Recognition**. 
 
@@ -7,9 +7,20 @@ Link to paper: https://arxiv.org/abs/2101.11605
 
 Structure of Self-Attention layer in paper:
 
-![self-attention layer](https://github.com/CandiceD17/BoTNet-for-Visual-Recognition/blob/master/asset/self-attention-layer.png)
+![self-attention layer](https://github.com/CandiceD17/Bottleneck-Transformers-for-Visual-Recognition/blob/master/asset/self-attention-layer.png)
 
-### Train the Network
+## Dependency
+
+External libraries: eniops, yacs
+
+Use pip command to install:
+
+```shell
+$ pip install eniops
+$ pip install yacs
+```
+
+## Train the Network
 
 To train BoTNet from scratch using the standard training process:
 
@@ -17,11 +28,18 @@ To train BoTNet from scratch using the standard training process:
 $ python3 train.py
 ```
 
-To execute this code, you should have ImageNet downloaded in your local directory and correct path set in `IMAGE_DIR` in *train.py*.
+To execute this code, you should have ImageNet downloaded in your local directory and correct path set in `_C.TRAIN.DATASET` and`_C.TRAIN.DATASET` in `util/config.py`.
 
-You can also set the hyperparameters, including batch size, epoch, learning rate, and device inside *train.py*.
+You can use `.yaml` or pass in any parameters in command line to overwrite the configures in `config.py`.
 
-### References
+For exmaple, to update `cfg.TRAIN.BATCH_SIZE`, you can either type `--train-batch_size` in command line or pass a `.yaml` file through `--cfg` using the below format:
+
+```yaml
+TRAIN:
+	BATCH_SIZE: 256
+```
+
+## References
 
 Part of the codes are cited from:
 
@@ -34,9 +52,7 @@ Training Process:
 
 https://github.com/BIGBALLON/distribuuuu (Biggest credit to my mentor at Sensetime!!)
 
+## Features to come:
 
-Dependency: eniops, yacs
-pip install eniops
-pip install yacs
-
-Features to come:
+- Downsample at the first stage of attention layer with correct dimensions
+- Object detection experiments for downstream task
